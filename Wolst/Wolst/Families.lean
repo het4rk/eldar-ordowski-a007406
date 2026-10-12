@@ -1,5 +1,13 @@
 import Wolst.Basic
 
+/-!
+# Infinite families via the leading-digit criterion
+
+`coprime_six_a`, the 3-smooth case `conjecture_smooth`, the families `n = c q`
+(`conjecture_smooth_mul_prime`, `conjecture_two/three/four_mul_prime`,
+`conjecture_smooth_mul_large_prime`), and the general criterion `conjecture_of_leading_digits`.
+-/
+
 namespace Wolst
 
 lemma a_one : a 1 = 1 := by
