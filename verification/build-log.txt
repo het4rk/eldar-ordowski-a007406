@@ -1,0 +1,37 @@
+# Fresh clone of https://github.com/het4rk/eldar-ordowski-a007406 at d0bb63d8d1078150488d0db7bd2235d76f4975a3
+# Mathlib .lake/packages reused from an identical lake-manifest (Mathlib 1f414401); project files compiled from scratch.
+# Command: lake build
+⚠ [9020/9024] Built Wolst.Basic (249s)
+warning: Wolst/Basic.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: Wolst/Basic.lean:115:8: This simp argument is unused:
+  Function.Embedding.coeFn_mk
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [hS1, Finset.mem_filter, Finset.mem_Icc, Finset.mem_map]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [9021/9024] Built Wolst.Families (180s)
+warning: Wolst/Families.lean:81:14: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+warning: Wolst/Families.lean:98:14: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+warning: Wolst/Families.lean:183:14: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+⚠ [9022/9024] Built Wolst.Prime (158s)
+warning: Wolst/Prime.lean:85:14: `if_pos` has been deprecated: Use `ite_eq_left` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵p̵o̵s̵i̲t̲e̲_̲e̲q̲_̲l̲e̲f̲t̲
+warning: Wolst/Prime.lean:108:14: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+✔ [9023/9024] Built Wolst (527s)
+Build completed successfully (9024 jobs).
+build exit 0
