@@ -1,0 +1,30 @@
+name: Lean build
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+defaults:
+  run:
+    shell: bash -o pipefail {0}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Fetch Mathlib cache
+        working-directory: Wolst
+        run: lake exe cache get
+      - name: Build
+        working-directory: Wolst
+        run: lake build 2>&1 | tee build_ci.txt
+      - name: Axiom report
+        working-directory: Wolst
+        run: lake env lean Axioms.lean 2>&1 | tee axioms_ci.txt
+      - name: No sorry warnings in build
+        run: "! grep -n \"declaration uses 'sorry'\" Wolst/build_ci.txt"
+      - name: Check axioms
+        run: bash scripts/check_axioms.sh Wolst/axioms_ci.txt
