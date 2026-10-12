@@ -1,0 +1,91 @@
+\documentclass[11pt]{amsart}
+\usepackage{amsmath,amssymb,amsthm,hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\Hh}{H^{(2)}}
+\title[On a conjecture of Eldar and Ordowski]{Wolstenholme numbers and a gcd conjecture of Eldar and Ordowski: infinite families, formally verified}
+\author{Hetark Shah, AI-assisted by Grok}
+\date{October 12, 2026}
+\begin{document}
+\begin{abstract}
+Let $a(n)$ be the numerator of $\Hh_n=\sum_{k=1}^n k^{-2}$ (OEIS A007406). Eldar and Ordowski conjectured (2019) that $\gcd(n,a(n-1))=1$ for every composite $n>3$; for primes $n\ge5$ Wolstenholme's theorem gives $\gcd=n$. We prove a leading-digit criterion: if $q$ is prime, $q\le m$, and $q\nmid a(U)$, where $U$ is the leading base-$q$ digit of $m$, then $q\nmid a(m)$. As consequences, $\gcd(6,a(m))=1$ for all $m\ge1$, and the conjecture holds for all $n=2^i3^j>3$, for all $n=2q$ ($q\ge3$ prime), $n=3q$ ($q\ge7$), $n=4q$ ($q\ge5$, $q\ne7$), and more generally for $n=cq$ with $c\ge2$ $3$-smooth and $q>c$ a prime not dividing $a(c-1)$, which covers all sufficiently large $q$ for each $c$; this extends to $n=cq^k$ for every $k\ge1$ (e.g.\ $n=2q^k$). We also formalize Wolstenholme's theorem $p\mid a(p-1)$ for primes $p\ge5$, so the conjectured \emph{equality} $\gcd(n,a(n-1))=\mathrm{A089026}(n)$ is verified for every prime $n>3$ as well. All results are formalized in Lean~4 with Mathlib, stated against the definitions in the \texttt{google-deepmind/formal-conjectures} repository, with no \texttt{sorry} and only the standard axioms.
+\end{abstract}
+\maketitle
+
+\section{The conjecture}
+OEIS A007406 records: \emph{``Conjecture: for $n>3$, $\gcd(n,a(n-1))=\mathrm{A089026}(n)$. Checked up to $n=10^5$.''} (A.~Eldar, T.~Ordowski, Jul.~28, 2019). Here $\mathrm{A089026}(n)=n$ if $n$ is prime and $1$ otherwise. J.~Sondow added that the prime case follows from Wolstenholme's theorem and that \emph{``it remains to show that $\gcd(n,a(n-1))=1$ if $n>3$ is composite.''} The statement is formalized as \texttt{OeisA7406.conjecture} in \texttt{FormalConjectures/OEIS/7406.lean}, tagged \texttt{research open}.
+
+\section{The leading-digit lemma}
+Throughout, $q$ is prime and $v_q$ is the $q$-adic valuation on $\mathbb{Q}$.
+\begin{lemma}\label{lem:key}
+Let $m\ge1$, $s=\lfloor\log_q m\rfloor$ and $U=\lfloor m/q^s\rfloor$, so $1\le U<q$. If $q\nmid a(U)$ then $v_q(\Hh_m)=-2s$.
+\end{lemma}
+\begin{proof}
+Since $U<q$, every term $u^{-2}$, $1\le u\le U$, is a $q$-adic unit, so $v_q(\Hh_U)\ge0$; as $q\nmid a(U)$ and the denominator of $\Hh_U$ is coprime to $q$, $v_q(\Hh_U)=0$. Split $\{1,\dots,m\}$ into $S_1=\{k:q^s\mid k\}=\{q^su:1\le u\le U\}$ and $S_0$. Then $\sum_{S_1}k^{-2}=q^{-2s}\Hh_U$ has valuation $-2s$. For $k\in S_0$ we have $v_q(k)\le s-1$, so $v_q(k^{-2})\ge -2s+2$; since all terms are positive, the ultrametric inequality gives $v_q(\sum_{S_0}k^{-2})\ge-2s+1$. Hence $v_q(\Hh_m)=-2s$.
+\end{proof}
+\begin{theorem}[criterion]\label{thm:crit}
+If $q\le m$ and $q\nmid a(\lfloor m/q^{\lfloor\log_q m\rfloor}\rfloor)$, then $q\nmid a(m)$. Consequently, if $n>3$ is composite and for every prime $q\mid n$, $q$ does not divide $a$ of the leading base-$q$ digit of $n-1$, then $\gcd(n,a(n-1))=1$.
+\end{theorem}
+\begin{proof}
+Here $s\ge1$, so $v_q(\Hh_m)<0$; if $q\mid a(m)$ then $v_q(\Hh_m)\ge1$. For the second claim, a prime divisor $q$ of composite $n$ satisfies $q<n$, so $q\le n-1$.
+\end{proof}
+This mirrors the classical leading-digit argument for $p\nmid$ numerators of ordinary harmonic numbers (cf.\ Eswarathasan--Levine, Boyd, and the discussion of Erd\H{o}s Problem \#291).
+
+\section{Consequences}
+\begin{theorem}\label{thm:six}
+For all $m\ge1$, $\gcd(6,a(m))=1$.
+\end{theorem}
+\begin{proof}
+For $q=2$ the leading digit is $1$ and $a(1)=1$; for $q=3$ it is $1$ or $2$, and $a(1)=1$, $a(2)=5$. Small $m<q$ are checked directly.
+\end{proof}
+\begin{corollary}
+The conjecture holds for every $n=2^i3^j>3$.
+\end{corollary}
+\begin{theorem}\label{thm:cq}
+Let $c=2^i3^j\ge2$ and let $q>c$ be prime with $q\nmid a(c-1)$. Then $\gcd(cq,a(cq-1))=1$, that is, the conjecture holds at $n=cq$.
+\end{theorem}
+\begin{proof}
+Primes $2,3$ are handled by Theorem~\ref{thm:six}. For $q$: $q\le cq-1<q^2$, so $s=1$ and the leading digit is $\lfloor (cq-1)/q\rfloor=c-1$.
+\end{proof}
+\begin{corollary}
+The conjecture holds for $n=2q$ (all primes $q\ge3$), $n=3q$ (primes $q\ge7$), and $n=4q$ (primes $q\ge5$, $q\neq7$), using $a(1)=1$, $a(2)=5$, $a(3)=49$. For each $3$-smooth $c\ge2$ it holds for $n=cq$ for all primes $q>\max(c,a(c-1))$.
+\end{corollary}
+
+\begin{theorem}\label{thm:cqk}
+Let $c=2^i3^j\ge2$, $q>c$ prime with $q\nmid a(c-1)$, and $k\ge1$. Then the conjecture holds at $n=cq^k$. In particular it holds for $n=2q^k$, for every odd prime $q$ and every $k\ge1$.
+\end{theorem}
+\begin{proof}
+For $m=cq^k-1$ we have $q^k\le(c-1)q^k\le m<cq^k<q^{k+1}$, so $\lfloor\log_q m\rfloor=k$ and the leading digit is $c-1$. Primes $2,3$ are handled by Theorem~\ref{thm:six}.
+\end{proof}
+
+\section{The prime direction}
+\begin{theorem}[Wolstenholme]\label{thm:w}
+For every prime $p\ge5$, $p\mid a(p-1)$. Hence $\gcd(p,a(p-1))=p=\mathrm{A089026}(p)$ for every prime $p>3$.
+\end{theorem}
+\begin{proof}
+Let $F=(p-1)!$ and $N=\sum_{k=1}^{p-1}(F/k)^2$, so that $\Hh_{p-1}F^2=N$. In $\mathbb{F}_p$, Wilson gives $k\cdot(F/k)=-1$, so $(F/k)^2=(F/k)^2k^{p-1}=k^{p-3}$. Therefore $N\equiv\sum_{x\in\mathbb{F}_p}x^{p-3}=0$, since $0<p-3<p-1$. As $p\nmid F^2$, $p$ divides the numerator.
+\end{proof}
+\begin{corollary}
+The full conjecture $\gcd(n,a(n-1))=\mathrm{A089026}(n)$ holds for every $n>3$ that is prime, $3$-smooth, or of the form $2q^k$ ($q$ an odd prime, $k\ge1$), and for $n=cq^k$ as in Theorem~\ref{thm:cqk}.
+\end{corollary}
+
+\begin{remark}[Coverage and limits]
+A short computation (\texttt{coverage.py}) shows the criterion of Theorem~\ref{thm:crit} settles $76{,}100$ of the $90{,}407$ composites $4\le n\le10^5$ (about $84\%$). It cannot settle every case: $q\mid a(q-1)$ (Wolstenholme) and $q\mid a((q-1)/2)$ for all $q\ge5$, so for instance $n=q^2$ needs a second-order analysis. There $\Hh_{q^2-1}=\sum_{q\nmid k<q^2}k^{-2}+q^{-2}\Hh_{q-1}$, and the first sum is $\equiv0\pmod{q^2}$. One finds that $q\mid a(q^2-1)$ would force $v_q(\Hh_{q-1})\ge3$, which by Glaisher's congruence $\Hh_{q-1}\equiv\tfrac{2}{3}qB_{q-3}\pmod{q^2}$ requires $q\mid B_{q-3}$ (a Wolstenholme prime, e.g.\ $16843$) together with a further congruence. We do not formalize this.
+\end{remark}
+
+\section{Formalization}
+The Lean project \texttt{Wolst} (Lean \texttt{v4.35.0-rc4}, Mathlib \texttt{v4.35.0-rc4}) defines \texttt{a} and \texttt{A89026} verbatim from \texttt{formal-conjectures} and proves:
+\texttt{padicValRat\_H} (Lemma~\ref{lem:key}), \texttt{not\_dvd\_a} and \texttt{conjecture\_of\_leading\_digits} (Theorem~\ref{thm:crit}), \texttt{coprime\_six\_a}, \texttt{conjecture\_smooth}, \texttt{conjecture\_smooth\_mul\_prime}, \texttt{conjecture\_two/three/four\_mul\_prime}, \texttt{conjecture\_smooth\_mul\_large\_prime}, \texttt{conjecture\_smooth\_mul\_prime\_pow}, \texttt{conjecture\_two\_mul\_prime\_pow}, \texttt{prime\_dvd\_a} (Theorem~\ref{thm:w}), \texttt{conjecture\_prime}, and \texttt{conjecture\_on\_families}. Each conclusion is literally \texttt{Nat.gcd n (a (n - 1)) = A89026 n}. \texttt{\#print axioms} reports only \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}. No \texttt{sorry} or \texttt{native\_decide} is used.
+
+\section{Novelty}
+As of October 12, 2026, OEIS A007406 lists the conjecture as open, and the formal-conjectures entry is tagged \texttt{research open}. A web search found no published proof of any infinite family. The leading-digit technique itself is classical. What we believe is new is applying it to this conjecture and the resulting families.
+
+\begin{thebibliography}{9}
+\bibitem{oeis} OEIS Foundation, \emph{A007406: Wolstenholme numbers}, \url{https://oeis.org/A007406}.
+\bibitem{fc} Google DeepMind, \emph{formal-conjectures}, \texttt{FormalConjectures/OEIS/7406.lean}.
+\bibitem{mes} R.~Me\v{s}trovi\'c, \emph{Wolstenholme's theorem: its generalizations and extensions}, arXiv:1111.3057.
+\bibitem{el} A.~Eswarathasan, E.~Levine, \emph{$p$-integral harmonic sums}, Discrete Math.\ 91 (1991).
+\end{thebibliography}
+\end{document}
