@@ -1,4 +1,9 @@
 import Wolst
+
+/-!
+Axiom report for the Eldar–Ordowski (A007406) development.
+Expected output: only `propext`, `Classical.choice`, `Quot.sound`.
+-/
 open Wolst
 #print axioms padicValRat_H
 #print axioms not_dvd_a

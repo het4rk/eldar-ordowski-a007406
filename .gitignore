@@ -3,3 +3,7 @@
 *.log
 *.fls
 *.fdb_latexmk
+build_ci.txt
+axioms_ci.txt
+*.out
+*.synctex.gz
