@@ -1,32 +1,73 @@
-# Partial results on the Eldar–Ordowski conjecture (OEIS A007406)
+# Partial results on the Eldar–Ordowski gcd conjecture (OEIS A007406)
 
-**Conjecture** (A. Eldar and T. Ordowski, 2019; listed as open on https://oeis.org/A007406, and as
-`OeisA7406.conjecture`, tagged `research open`, in google-deepmind/formal-conjectures):
-for n > 3, gcd(n, a(n-1)) = A089026(n), where a(n) is the numerator of sum_{k<=n} 1/k^2.
-The prime case is Wolstenholme's theorem, so what remains open is that gcd(n, a(n-1)) = 1 for composite n.
+[![Lean build](https://github.com/het4rk/eldar-ordowski-a007406/actions/workflows/lean.yml/badge.svg)](https://github.com/het4rk/eldar-ordowski-a007406/actions/workflows/lean.yml)
 
-**Proved here (Lean 4 + Mathlib, no sorry, axioms = propext, Classical.choice, Quot.sound):**
-- `padicValRat_H`, `not_dvd_a`: leading-digit lemma. Let U be the leading base-q digit of m.
-  If q does not divide a(U), then v_q(H_m) = -2*floor(log_q m), and in particular q does not divide a(m).
-- `conjecture_of_leading_digits`: a general sufficient criterion for any composite n.
-- `coprime_six_a`: gcd(6, a(m)) = 1 for all m >= 1.
-- `conjecture_smooth`: the conjecture holds for all n = 2^i 3^j > 3.
-- `conjecture_smooth_mul_prime`: the conjecture holds for n = c*q, where c >= 2 is 3-smooth,
-  q > c is prime, and q does not divide a(c-1).
-- `conjecture_two_mul_prime`, `conjecture_three_mul_prime`, `conjecture_four_mul_prime`: the cases
-  n = 2q (q >= 3), n = 3q (q >= 7) and n = 4q (q >= 5, q != 7).
-- `conjecture_smooth_mul_prime_pow`: n = c*q^k for any k >= 1 under the same hypotheses; `conjecture_two_mul_prime_pow`: n = 2*q^k for every odd prime q.
-- `prime_dvd_a`, `conjecture_prime`: Wolstenholme's theorem p | a(p-1) for p >= 5, formalized, so the conjectured equality holds at every prime n > 3.
-- `conjecture_on_families`: the full equality holds for every n > 3 that is prime, 3-smooth, or 2*q^k.
-- `conjecture_smooth_mul_large_prime`: for each 3-smooth c, the conjecture holds at n = c*q for all large primes q.
+**Author:** Hetark Shah, AI-assisted by Grok  
+**Date:** October 12, 2026
 
-Each statement ends in exactly `Nat.gcd n (a (n - 1)) = A89026 n`, with `a` and `A89026` copied verbatim from formal-conjectures.
+## Result
 
-Not covered: n = q^k (leading digit q-1, which q always divides), general n = pq, and the q^2 case (would need Glaisher-type congruences).
+Let `a(n)` be the numerator of `Σ_{k≤n} 1/k²` ([A007406](https://oeis.org/A007406)). A. Eldar and T. Ordowski (2019) conjectured that `gcd(n, a(n−1)) = A089026(n)` for `n > 3`: that is, `n` for primes and `1` for composites. It is listed as `research open` in formal-conjectures (`FormalConjectures/OEIS/7406.lean`). We prove a leading-digit criterion (not new in substance; the order-2 analogue of the classical argument for harmonic numbers), formalize Wolstenholme's theorem, and derive the conjecture on explicit infinite families.
 
-Build: `cd Wolst && lake build && lake env lean Axioms.lean` (see `Wolst/axioms.txt`).
-Paper: `paper/paper.pdf`. Coverage script: `paper/coverage.py`. The criterion settles 84% of the composites up to 10^5; this is computed, not formalized.
-The full conjecture remains open. The criterion can never cover, for example, n = q^2, since q divides a(q-1).
+## Status
+
+**Partial result. The full conjecture remains open.** Proved: every `n > 3` that is prime, 3-smooth, of the form `2q^k`, or `c·q^k` with `c ≥ 2` 3-smooth and prime `q > c`, `q ∤ a(c−1)`. Open: e.g. `n = q^k` (k ≥ 2) and general `pq`.
+
+## Theorems and Lean names
+
+| Lean name | Statement |
+|---|---|
+| `padicValRat_H`, `not_dvd_a` | leading-digit lemma: `q ∤ a(U) ⇒ v_q(H_m) = −2⌊log_q m⌋` |
+| `conjecture_of_leading_digits` | general sufficient criterion for composite `n` |
+| `coprime_six_a` | `gcd(6, a m) = 1` |
+| `conjecture_smooth` | `n = 2^i 3^j` |
+| `conjecture_smooth_mul_prime`, `conjecture_smooth_mul_prime_pow` | `n = c q`, `n = c q^k` |
+| `conjecture_two/three/four_mul_prime`, `conjecture_two_mul_prime_pow` | `2q`, `3q` (q≥7), `4q` (q≥5, q≠7), `2q^k` |
+| `conjecture_smooth_mul_large_prime` | `c q` for all large primes `q` |
+| `prime_dvd_a`, `conjecture_prime` | Wolstenholme: `p ∣ a(p−1)`, prime case |
+| `conjecture_on_families` | combined: prime, 3-smooth, or `2q^k` |
+
+No `sorry`, no `native_decide`, no extra hypotheses.
+
+## Build
+
+Toolchain `leanprover/lean4:v4.35.0-rc4`; Mathlib `v4.35.0-rc4` (commit `1f414401f69059aa7eead47b53ee40bd38455eeb`, pinned in `lake-manifest.json`).
+
+```bash
+cd Wolst
+lake exe cache get
+lake build
+lake env lean Axioms.lean
+```
+
+## Axioms output
+
+```
+'Wolst.padicValRat_H' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Wolst.not_dvd_a' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Wolst.coprime_six_a' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Wolst.conjecture_smooth' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Wolst.conjecture_smooth_mul_prime' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Wolst.conjecture_two_mul_prime' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Wolst.conjecture_three_mul_prime' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Wolst.conjecture_four_mul_prime' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Wolst.conjecture_smooth_mul_large_prime' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Wolst.conjecture_of_leading_digits' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Wolst.prime_dvd_a' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Wolst.conjecture_prime' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Wolst.conjecture_smooth_mul_prime_pow' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Wolst.conjecture_two_mul_prime_pow' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Wolst.conjecture_on_families' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
+
+## Machine-check attestation
+
+- [`verification/`](verification/) holds `build-log.txt` (fresh-clone build), `axioms.txt`, and [`VERIFICATION.md`](verification/VERIFICATION.md) with the commit SHA, toolchain, Mathlib commit, reproduce commands, the no-sorry grep result and SHA-256 hashes of the Lean sources.
+- [CI](https://github.com/het4rk/eldar-ordowski-a007406/actions/workflows/lean.yml) does a clean build on every push, fails on any `sorry`, and checks an axiom whitelist (`scripts/check_axioms.sh`). It uploads the build log and axiom report as the `lean-attestation` artifact and shows them in the job summary.
+
+## Paper
+
+[`paper/paper.tex`](paper/paper.tex) and [`paper/paper.pdf`](paper/paper.pdf).
 
 ## Exact match with upstream definitions
 
@@ -48,11 +89,12 @@ def a (n : ℕ) : ℕ :=
 ```
 `Wolst.a` and `Wolst.A89026` in `Wolst/Wolst/Basic.lean` have exactly these bodies, character for character, and every main theorem concludes `Nat.gcd n (a (n - 1)) = A89026 n`. (Upstream issue #4410 concerns a different, auto-generated file on the `auto_oeis` branch, not this one.)
 
-## Independent verification
+## Citation
 
-`verification/clean_build.log` comes from a fresh `git clone` of this repo, followed by `lake exe cache get`, `lake build` (`Build completed successfully (9024 jobs)`) and `lake env lean Axioms.lean`. All 15 reported declarations depend only on `[propext, Classical.choice, Quot.sound]`.
-CI (`.github/workflows/lean.yml`) repeats this on every push. It fails on any `declaration uses 'sorry'` warning, and `scripts/check_axioms.sh` fails on any axiom outside that list (so `sorryAx` and `Lean.ofReduceBool` are rejected).
+See [`CITATION.cff`](CITATION.cff):
 
-## Related work (honest novelty assessment)
+> Hetark Shah (AI-assisted by Grok), *Partial results on the Eldar–Ordowski gcd conjecture (OEIS A007406)*, 2026. https://github.com/het4rk/eldar-ordowski-a007406
 
-The leading-digit valuation lemma (`padicValRat_H`) is **not new**. It is the order-2 analogue of the standard argument for J(p) = {n : p | numerator of H_n} (Eswarathasan–Levine 1991, Boyd 1994, Kamano 2011, Sanna 2016, Wu–Chen 2017). Generalized harmonic numbers H_n^(r) are treated in the same framework by Ç. Altuntaş (Bull. Korean Math. Soc. 60 (2023) 933–955). Wolstenholme's congruence p | a(p-1) is classical (1862), and Glaisher (1900) gives the refinement mod p^2. We found no work applying these tools to the Eldar–Ordowski gcd conjecture. What is new here is (i) the reduction of that conjecture to the leading-digit criterion, (ii) the explicit infinite families, and (iii) the first machine-checked proofs of them.
+## License
+
+Apache-2.0 (the same as Mathlib). See [`LICENSE`](LICENSE).

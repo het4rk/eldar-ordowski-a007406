@@ -1,23 +1,50 @@
-\documentclass[11pt]{amsart}
-\usepackage{amsmath,amssymb,amsthm,hyperref}
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs,tabularx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+\usepackage{array}
+\def\UrlBreaks{\do0\do1\do2\do3\do4\do5\do6\do7\do8\do9\do a\do b\do c\do d\do e\do f\do/\do.\do-}
+\emergencystretch=3em
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
 \theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
-\newcommand{\Hh}{H^{(2)}}
-\title[On a conjecture of Eldar and Ordowski]{Wolstenholme numbers and a gcd conjecture of Eldar and Ordowski: infinite families, formally verified}
+\newcommand{\lean}[1]{{\ttfamily\def\_{\textunderscore\allowbreak}\def\/{/\allowbreak}#1}}
 \author{Hetark Shah, AI-assisted by Grok}
+\newcommand{\Hh}{H^{(2)}}
 \date{October 12, 2026}
+\title{Wolstenholme numbers and a gcd conjecture of Eldar and Ordowski (OEIS A007406): infinite families, formalized in Lean~4}
 \begin{document}
-\begin{abstract}
-Let $a(n)$ be the numerator of $\Hh_n=\sum_{k=1}^n k^{-2}$ (OEIS A007406). Eldar and Ordowski conjectured (2019) that $\gcd(n,a(n-1))=1$ for every composite $n>3$; for primes $n\ge5$ Wolstenholme's theorem gives $\gcd=n$. We prove a leading-digit criterion: if $q$ is prime, $q\le m$, and $q\nmid a(U)$, where $U$ is the leading base-$q$ digit of $m$, then $q\nmid a(m)$. As consequences, $\gcd(6,a(m))=1$ for all $m\ge1$, and the conjecture holds for all $n=2^i3^j>3$, for all $n=2q$ ($q\ge3$ prime), $n=3q$ ($q\ge7$), $n=4q$ ($q\ge5$, $q\ne7$), and more generally for $n=cq$ with $c\ge2$ $3$-smooth and $q>c$ a prime not dividing $a(c-1)$, which covers all sufficiently large $q$ for each $c$; this extends to $n=cq^k$ for every $k\ge1$ (e.g.\ $n=2q^k$). We also formalize Wolstenholme's theorem $p\mid a(p-1)$ for primes $p\ge5$, so the conjectured \emph{equality} $\gcd(n,a(n-1))=\mathrm{A089026}(n)$ is verified for every prime $n>3$ as well. All results are formalized in Lean~4 with Mathlib, stated against the definitions in the \texttt{google-deepmind/formal-conjectures} repository, with no \texttt{sorry} and only the standard axioms.
-\end{abstract}
 \maketitle
+\begin{abstract}
+Let $a(n)$ be the numerator of $\Hh_n=\sum_{k=1}^n k^{-2}$ (OEIS A007406~\cite{oeis}). Eldar and Ordowski conjectured in 2019 that $\gcd(n,a(n-1))$ equals $n$ for primes $n>3$ and equals $1$ for composites $n>3$. \textbf{The full conjecture remains open.} We prove a leading-digit criterion: if $q\le m$ is prime and $q$ does not divide $a(U)$, where $U$ is the leading base-$q$ digit of $m$, then $q\nmid a(m)$. As consequences we show that $\gcd(6,a(m))=1$ for all $m\ge1$, and that the conjecture holds for every $n>3$ that is prime (via Wolstenholme's theorem, which we formalize), $3$-smooth, of the form $2q^k$ with $q$ an odd prime, and more generally $cq^k$ with $c\ge2$ $3$-smooth and $q>c$ a prime not dividing $a(c-1)$. All results are formalized in Lean~4 with Mathlib against the definitions in \texttt{formal-conjectures}~\cite{fc}, with no \texttt{sorry} and only the standard axioms.
+\end{abstract}
 
-\section{The conjecture}
-OEIS A007406 records: \emph{``Conjecture: for $n>3$, $\gcd(n,a(n-1))=\mathrm{A089026}(n)$. Checked up to $n=10^5$.''} (A.~Eldar, T.~Ordowski, Jul.~28, 2019). Here $\mathrm{A089026}(n)=n$ if $n$ is prime and $1$ otherwise. J.~Sondow added that the prime case follows from Wolstenholme's theorem and that \emph{``it remains to show that $\gcd(n,a(n-1))=1$ if $n>3$ is composite.''} The statement is formalized as \texttt{OeisA7406.conjecture} in \texttt{FormalConjectures/OEIS/7406.lean}, tagged \texttt{research open}.
+\section{Introduction}
+OEIS A007406~\cite{oeis} contains the comment: \emph{``Conjecture: for $n>3$, $\gcd(n,a(n-1))=\mathrm{A089026}(n)$. Checked up to $n=10^5$.''} (A.~Eldar and T.~Ordowski, Jul.~28, 2019). Here $\mathrm{A089026}(n)=n$ if $n$ is prime and $1$ otherwise. J.~Sondow added that the prime case follows from Wolstenholme's theorem and that \emph{``it remains to show that $\gcd(n,a(n-1))=1$ if $n>3$ is composite.''} The conjecture is formalized as \lean{OeisA7406.conjecture} in \nolinkurl{FormalConjectures/OEIS/7406.lean} of \texttt{formal-conjectures}~\cite{fc}, where it is tagged \texttt{research open}.
 
-\section{The leading-digit lemma}
+\section{Related work}
+Our key lemma is not new in substance. It is the order-$2$ analogue of the classical leading-digit argument for the sets $J(p)=\{n:p\mid\text{numerator of }H_n\}$, studied by Eswarathasan and Levine~\cite{el}, Boyd~\cite{boyd}, Sanna~\cite{sanna} and Wu and Chen~\cite{wc}; Kamano~\cite{kam} treats $3$-adic valuations of generalized harmonic numbers. Wolstenholme's theorem and its refinements are surveyed by Me\v{s}trovi\'c~\cite{mes}. As of October 12, 2026, the OEIS still lists the conjecture as open, and we found no work applying these tools to it. Our contribution is the reduction to a leading-digit criterion, the explicit infinite families, and machine-checked proofs stated against the upstream definitions (\texttt{formal-conjectures} commit \texttt{34ee0e3}). The formalization uses Lean~4~\cite{lean4} and Mathlib~\cite{mathlib}.
+
+\section{Statement}
+\begin{theorem}\label{thm:main}
+The equality $\gcd(n,a(n-1))=\mathrm{A089026}(n)$ holds for every $n>3$ that satisfies one of the following:
+\begin{enumerate}
+\item $n$ is prime;
+\item $n=2^i3^j$;
+\item $n=cq^k$ with $c=2^i3^j\ge2$, $k\ge1$, and $q>c$ a prime with $q\nmid a(c-1)$. This includes $n=2q^k$ for every odd prime $q$, $n=3q$ for $q\ge7$, and $n=4q$ for $q\ge5$, $q\ne7$.
+\end{enumerate}
+\end{theorem}
+\noindent Cases not covered include $n=q^k$ with $k\ge2$, and general $n=pq$ in which neither cofactor is $3$-smooth.
+
+\section{Proof overview}
+\subsection{The leading-digit lemma}
 Throughout, $q$ is prime and $v_q$ is the $q$-adic valuation on $\mathbb{Q}$.
 \begin{lemma}\label{lem:key}
 Let $m\ge1$, $s=\lfloor\log_q m\rfloor$ and $U=\lfloor m/q^s\rfloor$, so $1\le U<q$. If $q\nmid a(U)$ then $v_q(\Hh_m)=-2s$.
@@ -31,9 +58,7 @@ If $q\le m$ and $q\nmid a(\lfloor m/q^{\lfloor\log_q m\rfloor}\rfloor)$, then $q
 \begin{proof}
 Here $s\ge1$, so $v_q(\Hh_m)<0$; if $q\mid a(m)$ then $v_q(\Hh_m)\ge1$. For the second claim, a prime divisor $q$ of composite $n$ satisfies $q<n$, so $q\le n-1$.
 \end{proof}
-This mirrors the classical leading-digit argument for $p\nmid$ numerators of ordinary harmonic numbers (cf.\ Eswarathasan--Levine, Boyd, and the discussion of Erd\H{o}s Problem \#291).
-
-\section{Consequences}
+\subsection{Consequences}
 \begin{theorem}\label{thm:six}
 For all $m\ge1$, $\gcd(6,a(m))=1$.
 \end{theorem}
@@ -60,7 +85,7 @@ Let $c=2^i3^j\ge2$, $q>c$ prime with $q\nmid a(c-1)$, and $k\ge1$. Then the conj
 For $m=cq^k-1$ we have $q^k\le(c-1)q^k\le m<cq^k<q^{k+1}$, so $\lfloor\log_q m\rfloor=k$ and the leading digit is $c-1$. Primes $2,3$ are handled by Theorem~\ref{thm:six}.
 \end{proof}
 
-\section{The prime direction}
+\subsection{The prime direction}
 \begin{theorem}[Wolstenholme]\label{thm:w}
 For every prime $p\ge5$, $p\mid a(p-1)$. Hence $\gcd(p,a(p-1))=p=\mathrm{A089026}(p)$ for every prime $p>3$.
 \end{theorem}
@@ -71,26 +96,61 @@ Let $F=(p-1)!$ and $N=\sum_{k=1}^{p-1}(F/k)^2$, so that $\Hh_{p-1}F^2=N$. In $\m
 The full conjecture $\gcd(n,a(n-1))=\mathrm{A089026}(n)$ holds for every $n>3$ that is prime, $3$-smooth, or of the form $2q^k$ ($q$ an odd prime, $k\ge1$), and for $n=cq^k$ as in Theorem~\ref{thm:cqk}.
 \end{corollary}
 
-\begin{remark}[Coverage and limits]
+\begin{remark}[Coverage and limits]\label{rem:cov}
 A short computation (\texttt{coverage.py}) shows the criterion of Theorem~\ref{thm:crit} settles $76{,}100$ of the $90{,}407$ composites $4\le n\le10^5$ (about $84\%$). It cannot settle every case: $q\mid a(q-1)$ (Wolstenholme) and $q\mid a((q-1)/2)$ for all $q\ge5$, so for instance $n=q^2$ needs a second-order analysis. There $\Hh_{q^2-1}=\sum_{q\nmid k<q^2}k^{-2}+q^{-2}\Hh_{q-1}$, and the first sum is $\equiv0\pmod{q^2}$. One finds that $q\mid a(q^2-1)$ would force $v_q(\Hh_{q-1})\ge3$, which by Glaisher's congruence $\Hh_{q-1}\equiv\tfrac{2}{3}qB_{q-3}\pmod{q^2}$ requires $q\mid B_{q-3}$ (a Wolstenholme prime, e.g.\ $16843$) together with a further congruence. We do not formalize this.
 \end{remark}
 
+
 \section{Formalization}
-The Lean project \texttt{Wolst} (Lean \texttt{v4.35.0-rc4}, Mathlib \texttt{v4.35.0-rc4}) defines \texttt{a} and \texttt{A89026} verbatim from \texttt{formal-conjectures} and proves:
-\texttt{padicValRat\_H} (Lemma~\ref{lem:key}), \texttt{not\_dvd\_a} and \texttt{conjecture\_of\_leading\_digits} (Theorem~\ref{thm:crit}), \texttt{coprime\_six\_a}, \texttt{conjecture\_smooth}, \texttt{conjecture\_smooth\_mul\_prime}, \texttt{conjecture\_two/three/four\_mul\_prime}, \texttt{conjecture\_smooth\_mul\_large\_prime}, \texttt{conjecture\_smooth\_mul\_prime\_pow}, \texttt{conjecture\_two\_mul\_prime\_pow}, \texttt{prime\_dvd\_a} (Theorem~\ref{thm:w}), \texttt{conjecture\_prime}, and \texttt{conjecture\_on\_families}. Each conclusion is literally \texttt{Nat.gcd n (a (n - 1)) = A89026 n}. \texttt{\#print axioms} reports only \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}. No \texttt{sorry} or \texttt{native\_decide} is used.
+All declarations are in namespace \lean{Wolst}. The definitions \lean{a} and \lean{A89026} in \lean{Basic.lean} are copied verbatim from \texttt{formal-conjectures}, and every main theorem concludes exactly \lean{Nat.gcd n (a (n - 1)) = A89026 n}.
+\begin{table}[ht]
+\centering
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+Lean name (file) & Statement \\
+\midrule
+\lean{padicValRat\_H}, \lean{not\_dvd\_a} (\lean{Basic.lean}) & Lemma~\ref{lem:key}; first part of Theorem~\ref{thm:crit} \\
+\lean{conjecture\_of\_leading\_digits} (\lean{Families.lean}) & Theorem~\ref{thm:crit} \\
+\lean{coprime\_six\_a}, \lean{conjecture\_smooth} & Theorem~\ref{thm:six} and its corollary \\
+\lean{conjecture\_smooth\_mul\_prime} & Theorem~\ref{thm:cq} \\
+\lean{conjecture\_two/three/four\_mul\_prime}, \lean{conjecture\_smooth\_mul\_large\_prime} & corollaries of Theorem~\ref{thm:cq} \\
+\lean{conjecture\_smooth\_mul\_prime\_pow}, \lean{conjecture\_two\_mul\_prime\_pow} (\lean{Prime.lean}) & Theorem~\ref{thm:cqk} \\
+\lean{prime\_dvd\_a}, \lean{conjecture\_prime} & Theorem~\ref{thm:w} \\
+\lean{conjecture\_on\_families} & cases (1)--(2) and $2q^k$ of Theorem~\ref{thm:main} \\
+\bottomrule
+\end{tabularx}
+\caption{Theorems and their Lean names.}\label{tab:lean}
+\end{table}
 
-\section{Related work and novelty}
-Lemma~\ref{lem:key} is not new in substance. It is the order-$2$ analogue of the classical leading-digit argument for the sets $J(p)=\{n: p\mid \text{numerator of } H_n\}$ studied by Eswarathasan--Levine~\cite{el}, Boyd~\cite{boyd}, Kamano~\cite{kam}, Sanna~\cite{sanna} and Wu--Chen~\cite{wc}. Generalized harmonic numbers $H^{(r)}_n$ are treated in this framework by Altunta\c{s}~\cite{alt}. Theorem~\ref{thm:w} is Wolstenholme's (1862); Glaisher's refinement modulo $p^2$ is surveyed in~\cite{mes}. As of October 12, 2026, OEIS A007406 lists the Eldar--Ordowski conjecture as open, and the formal-conjectures entry is tagged \texttt{research open}. We found no work that applies these tools to the conjecture. Our contribution is the reduction to the leading-digit criterion, the explicit infinite families, and the first machine-checked proofs, stated against the upstream definitions (commit \texttt{34ee0e3}).
+\section{Reproducibility}
+\begin{itemize}
+\item Source code: \url{https://github.com/het4rk/eldar-ordowski-a007406}. The Lean project is in \texttt{Wolst/}.
+\item Toolchain: \texttt{leanprover/lean4:v4.35.0-rc4}. Mathlib: tag \texttt{v4.35.0-rc4}, commit \nolinkurl{1f414401f69059aa7eead47b53ee40bd38455eeb}, pinned in \texttt{lake-manifest.json}.
+\item Build:
+\begin{verbatim}
+cd Wolst
+lake exe cache get
+lake build
+lake env lean Axioms.lean
+\end{verbatim}
 
-\begin{thebibliography}{9}
-\bibitem{oeis} OEIS Foundation, \emph{A007406: Wolstenholme numbers}, \url{https://oeis.org/A007406}.
-\bibitem{fc} Google DeepMind, \emph{formal-conjectures}, \texttt{FormalConjectures/OEIS/7406.lean}.
-\bibitem{mes} R.~Me\v{s}trovi\'c, \emph{Wolstenholme's theorem: its generalizations and extensions}, arXiv:1111.3057.
-\bibitem{el} A.~Eswarathasan, E.~Levine, \emph{$p$-integral harmonic sums}, Discrete Math.\ 91 (1991).
-\bibitem{boyd} D.~W.~Boyd, A $p$-adic study of the partial sums of the harmonic series, \emph{Experiment.\ Math.} 3 (1994), 287--302.
-\bibitem{kam} K.~Kamano, On $3$-adic valuations of generalized harmonic numbers, \emph{Integers} 11 (2011).
-\bibitem{sanna} C.~Sanna, On the $p$-adic valuation of harmonic numbers, \emph{J.\ Number Theory} 166 (2016), 41--46.
-\bibitem{wc} B.-L.~Wu, Y.-G.~Chen, On certain properties of harmonic numbers, \emph{J.\ Number Theory} 175 (2017), 66--86.
-\bibitem{alt} \c{C}.~Altunta\c{s}, On the $p$-adic valuation of generalized harmonic numbers, \emph{Bull.\ Korean Math.\ Soc.} 60 (2023), 933--955.
+\item Axioms: each of the 15 declarations in \texttt{Axioms.lean} uses only the axioms \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}.
+\item Attestation: \texttt{verification/} contains the fresh-clone build log, the axiom output and \texttt{VERIFICATION.md}, which records the commit, the toolchain and SHA-256 hashes of the Lean sources. CI (\url{https://github.com/het4rk/eldar-ordowski-a007406/actions/workflows/lean.yml}) rebuilds the project on every push. It rejects \texttt{sorry} and non-whitelisted axioms, and uploads the build log and axiom report as artifacts.
+\end{itemize}
+
+\section{Limitations}
+\textbf{The full conjecture remains open.} The criterion can never settle $n=q^2$, because $q\mid a(q-1)$; a second-order analysis would be needed (Remark~\ref{rem:cov}), and it is not formalized. The coverage figure in that remark was computed by \texttt{paper/coverage.py}. It is not a formal result.
+
+\begin{thebibliography}{99}
+\bibitem{oeis} OEIS Foundation Inc., \emph{A007406: Wolstenholme numbers}, \url{https://oeis.org/A007406}.
+\bibitem{fc} Google DeepMind, \emph{formal-conjectures}, \url{https://github.com/google-deepmind/formal-conjectures}, file \nolinkurl{FormalConjectures/OEIS/7406.lean}.
+\bibitem{el} A.~Eswarathasan, E.~Levine, $p$-integral harmonic sums, \emph{Discrete Math.} \textbf{91} (1991), 249--257.
+\bibitem{boyd} D.~W.~Boyd, A $p$-adic study of the partial sums of the harmonic series, \emph{Experiment.\ Math.} \textbf{3} (1994), 287--302.
+\bibitem{kam} K.~Kamano, On $3$-adic valuations of generalized harmonic numbers, \emph{Integers} \textbf{11} (2011).
+\bibitem{sanna} C.~Sanna, On the $p$-adic valuation of harmonic numbers, \emph{J.\ Number Theory} \textbf{166} (2016), 41--46.
+\bibitem{wc} B.-L.~Wu, Y.-G.~Chen, On certain properties of harmonic numbers, \emph{J.\ Number Theory} \textbf{175} (2017), 66--86.
+\bibitem{mes} R.~Me\v{s}trovi\'c, Wolstenholme's theorem: its generalizations and extensions in the last hundred and fifty years, arXiv:1111.3057.
+\bibitem{mathlib} The mathlib Community, \emph{The Lean mathematical library}, in Proc.\ CPP 2020, ACM, 367--381.
+\bibitem{lean4} L.~de Moura, S.~Ullrich, \emph{The Lean 4 theorem prover and programming language}, in CADE-28, LNCS 12699, Springer, 2021, 625--635.
 \end{thebibliography}
 \end{document}
