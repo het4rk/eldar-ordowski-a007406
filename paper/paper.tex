@@ -79,13 +79,18 @@ A short computation (\texttt{coverage.py}) shows the criterion of Theorem~\ref{t
 The Lean project \texttt{Wolst} (Lean \texttt{v4.35.0-rc4}, Mathlib \texttt{v4.35.0-rc4}) defines \texttt{a} and \texttt{A89026} verbatim from \texttt{formal-conjectures} and proves:
 \texttt{padicValRat\_H} (Lemma~\ref{lem:key}), \texttt{not\_dvd\_a} and \texttt{conjecture\_of\_leading\_digits} (Theorem~\ref{thm:crit}), \texttt{coprime\_six\_a}, \texttt{conjecture\_smooth}, \texttt{conjecture\_smooth\_mul\_prime}, \texttt{conjecture\_two/three/four\_mul\_prime}, \texttt{conjecture\_smooth\_mul\_large\_prime}, \texttt{conjecture\_smooth\_mul\_prime\_pow}, \texttt{conjecture\_two\_mul\_prime\_pow}, \texttt{prime\_dvd\_a} (Theorem~\ref{thm:w}), \texttt{conjecture\_prime}, and \texttt{conjecture\_on\_families}. Each conclusion is literally \texttt{Nat.gcd n (a (n - 1)) = A89026 n}. \texttt{\#print axioms} reports only \texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}. No \texttt{sorry} or \texttt{native\_decide} is used.
 
-\section{Novelty}
-As of October 12, 2026, OEIS A007406 lists the conjecture as open, and the formal-conjectures entry is tagged \texttt{research open}. A web search found no published proof of any infinite family. The leading-digit technique itself is classical. What we believe is new is applying it to this conjecture and the resulting families.
+\section{Related work and novelty}
+Lemma~\ref{lem:key} is not new in substance. It is the order-$2$ analogue of the classical leading-digit argument for the sets $J(p)=\{n: p\mid \text{numerator of } H_n\}$ studied by Eswarathasan--Levine~\cite{el}, Boyd~\cite{boyd}, Kamano~\cite{kam}, Sanna~\cite{sanna} and Wu--Chen~\cite{wc}. Generalized harmonic numbers $H^{(r)}_n$ are treated in this framework by Altunta\c{s}~\cite{alt}. Theorem~\ref{thm:w} is Wolstenholme's (1862); Glaisher's refinement modulo $p^2$ is surveyed in~\cite{mes}. As of October 12, 2026, OEIS A007406 lists the Eldar--Ordowski conjecture as open, and the formal-conjectures entry is tagged \texttt{research open}. We found no work that applies these tools to the conjecture. Our contribution is the reduction to the leading-digit criterion, the explicit infinite families, and the first machine-checked proofs, stated against the upstream definitions (commit \texttt{34ee0e3}).
 
 \begin{thebibliography}{9}
 \bibitem{oeis} OEIS Foundation, \emph{A007406: Wolstenholme numbers}, \url{https://oeis.org/A007406}.
 \bibitem{fc} Google DeepMind, \emph{formal-conjectures}, \texttt{FormalConjectures/OEIS/7406.lean}.
 \bibitem{mes} R.~Me\v{s}trovi\'c, \emph{Wolstenholme's theorem: its generalizations and extensions}, arXiv:1111.3057.
 \bibitem{el} A.~Eswarathasan, E.~Levine, \emph{$p$-integral harmonic sums}, Discrete Math.\ 91 (1991).
+\bibitem{boyd} D.~W.~Boyd, A $p$-adic study of the partial sums of the harmonic series, \emph{Experiment.\ Math.} 3 (1994), 287--302.
+\bibitem{kam} K.~Kamano, On $3$-adic valuations of generalized harmonic numbers, \emph{Integers} 11 (2011).
+\bibitem{sanna} C.~Sanna, On the $p$-adic valuation of harmonic numbers, \emph{J.\ Number Theory} 166 (2016), 41--46.
+\bibitem{wc} B.-L.~Wu, Y.-G.~Chen, On certain properties of harmonic numbers, \emph{J.\ Number Theory} 175 (2017), 66--86.
+\bibitem{alt} \c{C}.~Altunta\c{s}, On the $p$-adic valuation of generalized harmonic numbers, \emph{Bull.\ Korean Math.\ Soc.} 60 (2023), 933--955.
 \end{thebibliography}
 \end{document}
